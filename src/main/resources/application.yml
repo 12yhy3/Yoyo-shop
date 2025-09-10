@@ -1,0 +1,56 @@
+server:
+  port: 8080
+  name: yoyo
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/yoyo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+
+data:
+    redis:
+      # Redis服务器连接配置
+      # 生产环境建议使用正式服务器地址
+      host: localhost
+      # Redis服务端口（默认6379）
+      port: 6379
+      # 使用的数据库索引（通常取值范围0-15）
+      database: 1
+      # 命令执行超时时间（单位：毫秒）
+      timeout: 3000
+      # 连接建立超时时间（单位：毫秒）
+      connect-timeout: 5000
+
+mybatis:
+  type-aliases-package: yhy.project.entity
+  # Mapper XML文件路径配置
+  # 默认加载classpath下mapper目录所有XML文件（支持通配符）
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    # 数据库字段到Java属性的自动驼峰命名映射
+    # 开启后user_name字段自动映射到userName属性
+    map-underscore-to-camel-case: true
+    # MyBatis日志实现配置
+    # 开发阶段建议开启控制台日志（生产环境建议关闭）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    org.springframework.web: debug
+    com.share.store: debug #\u914D\u5236\u63A7\u5236\u53F0\u6253\u5370sql
+## pagehelper 分页插件配置
+#pagehelper:
+#  #dialect: mysql # PageHelper插件4.0.0以后的版本支持自动识别使用的数据库
+#  reasonable: true
+#  supportMethodsArguments: true
+#  params: count=countSql
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+upload:
+  path: D:\App\Yoyo-shop\upload\

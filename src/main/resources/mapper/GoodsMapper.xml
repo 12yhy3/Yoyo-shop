@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="yhy.project.mapper.GoodsMapper">
+
+    <!--  根据榜单类型查询商品列表  -->
+    <select id="selectGoodsByTopType" resultType="Goods">
+        select goods.* from top
+                                JOIN goods ON top.goods_id = goods.id
+        WHERE top.type = #{topType} AND goods.status = 1 limit 3
+    </select>
+
+    <!--  根据商品种类id查询商品列表  -->
+    <select id="selectGoodsByTypeId" resultType="Goods">
+        select * from goods where type_id = #{typeId} AND status = 1 limit #{startIndex},#{size}
+    </select>
+
+    <!--  根据商品种类id查询商品数量  -->
+    <select id="selectGoodsCountByTypeId" resultType="Long">
+        select count(*) from goods where type_id = #{typeId} AND status = 1
+    </select>
+
+    <!--  根据榜单类型查询商品列表（含分页）  -->
+    <select id="selectGoodsByTopTypeAndPage" resultType="Goods">
+        select goods.* from top
+                                JOIN goods ON top.goods_id = goods.id
+        WHERE top.type = #{topType} AND goods.status = 1 limit #{startIndex},#{size}
+    </select>
+
+    <!--  根据榜单类型id查询商品数量  -->
+    <select id="selectGoodsCountByTopType" resultType="Long">
+        select count(*) from top
+                                 JOIN goods ON top.goods_id = goods.id
+        WHERE top.type = #{topType} AND goods.status = 1
+    </select>
+
+    <!-- 根据商品id获取商品信息  -->
+    <select id="selectGoodsById" resultType="GoodsVo">
+        select * from goods where id = #{id} AND status = 1
+    </select>
+
+    <!-- 获取销量最好的的商品列表  -->
+    <select id="selectGoodsRanking" resultType="Goods">
+        select goods.* from goods
+                                JOIN
+                            (select sum(amount) total, goods_id from item group by goods_id order by total desc limit 0, 5) hot
+                            on goods.id = hot.goods_id
+    </select>
+
+    <!--  根据商品名称模糊查询  -->
+    <select id="selectGoodsByName" resultType="Goods">
+        select * from goods where name like concat('%', #{name}, '%') AND status = 1 limit #{startIndex},#{size}
+    </select>
+
+    <!--  根据商品名称模糊查询数量  -->
+    <select id="selectGoodsCountByName" resultType="Long">
+        select count(*) from goods where name like concat('%', #{name}, '%') AND status = 1
+    </select>
+    <!--  根据商品id更新库存数量  -->
+    <update id="updateGoodsStockById">
+        update goods set stock = stock - #{changeNum} where id = #{id}
+    </update>
+
+
+    <!--    -->
+    <!--根据商品分类Id查询个数 -->
+    <select id="getCountByTypeId">
+        select count(1) from goods where type_id=#{tid}
+    </select>
+    <!-- 查询所有商品和榜单类型 -->
+    <select id="selectGoods" resultType="goodsDTO">
+        select g.*,t.id 'tid',t.type 'types' from goods g  left outer join top t ON g.id=t.goods_id
+        <where>
+            <if test="name != null">
+                and g.name like concat('%',#{name},'%')
+            </if>
+            <if test="typeId != null">
+                and g.type_id = #{typeId}
+            </if>
+            <if test="types != null">
+                and t.type = #{types}
+            </if>
+        </where>
+        order by g.id desc
+    </select>
+
+    <!--添加返回对象主键id-->
+    <insert id="saveGoods" parameterType="Goods" useGeneratedKeys="true" keyProperty="id">
+        insert into goods
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                name,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="intro != null">
+                intro,
+            </if>
+            <if test="cover != null">
+                cover,
+            </if>
+            <if test="image1 != null">
+                image1,
+            </if>
+            <if test="image2 != null">
+                image2,
+            </if>
+            <if test="stock != null">
+                stock,
+            </if>
+            <if test="typeId != null">
+                type_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name },
+            </if>
+            <if test="price != null">
+                #{price },
+            </if>
+            <if test="intro != null">
+                #{intro },
+            </if>
+            <if test="cover != null">
+                #{cover },
+            </if>
+            <if test="image1 != null">
+                #{image1 },
+            </if>
+            <if test="image2 != null">
+                #{image2 },
+            </if>
+            <if test="stock != null">
+                #{stock },
+            </if>
+            <if test="typeId != null">
+                #{typeId },
+            </if>
+        </trim>
+    </insert>
+
+    <!--修改返回主键id-->
+    <update id="updateGoods" parameterType="Goods" useGeneratedKeys="true" keyProperty="id">
+        update goods
+        <set>
+            <if test="name != null">
+                name=#{name},
+            </if>
+            <if test="price != null">
+                price=#{price},
+            </if>
+            <if test="intro != null">
+                intro=#{intro},
+            </if>
+            <if test="cover != null">
+                cover=#{cover},
+            </if>
+            <if test="image1 != null">
+                image1=#{image1},
+            </if>
+            <if test="image2 != null">
+                image2=#{image2},
+            </if>
+            <if test="stock != null">
+                stock=#{stock},
+            </if>
+            <if test="typeId != null">
+                type_id=#{typeId},
+            </if>
+            <if test="status != null">
+                status=#{status},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <delete id="delGoods">
+        delete  from goods where id=#{id}
+    </delete>
+
+    <!--查询所有商品和对应的榜单top表-->
+    <select id="lists" resultType="GoodsDTO">
+        select g.*,t.id 'tid',t.type  from goods g join top t
+        on g.id=t.goods_id
+        <where>
+            <if test="name != null">
+                name like concat('%',${name},'%')
+            </if>
+        </where>
+    </select>
+
+</mapper>

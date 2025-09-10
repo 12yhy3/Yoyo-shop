@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="yhy.project.mapper.ItemMapper">
+
+    <!--  批量插入  -->
+    <insert id="insertItemsBatch" parameterType="java.util.List">
+        insert into item(title,pic,price,amount,goods_id,order_id)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.title},#{item.pic},#{item.price},#{item.amount},#{item.goodsId},#{item.orderId})
+        </foreach>
+    </insert>
+
+    <!--  根据订单id查询订单项  -->
+    <select id="selectItemsByOrderId" parameterType="Integer" resultType="Item">
+        select * from item where order_id = #{orderId}
+    </select>
+
+</mapper>
